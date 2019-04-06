@@ -48,17 +48,29 @@ while True:
                 rectToDraw = rect
             
         if rectToDraw:
-            box = cv2.boxPoints(rectToDraw)
-            box = np.int0(box)
-            cv2.drawContours(res,[box],0,(0,0,255),2)
             (x, y), (width, height), angle = rectToDraw
-            tracker.append({"x": x, "y": y, "area": current_biggest})
+            if width*height > 300:
+                box = cv2.boxPoints(rectToDraw)
+                box = np.int0(box)
+                cv2.drawContours(res,[box],0,(0,0,255),2)
+                (x, y), (width, height), angle = rectToDraw
+                tracker.append({"x": x, "y": y, "area": current_biggest})
 
-        if len(tracker) > 1 and isclose(tracker[-1]["area"], tracker[-2]["area"], rel_tol=0.9):
-            if tracker[-1]["y"] > tracker[-2]["y"]+50:
-                if shouldMove():    
-                    print("down")
-                    keyboard.press(Key.down)
+                if len(tracker) > 1 and isclose(tracker[-1]["area"], tracker[-2]["area"], rel_tol=10): 
+                    if shouldMove():
+                        if tracker[-1]["y"] > tracker[-2]["y"]+50: 
+                            print("down")
+                            keyboard.press(Key.down)
+                        elif tracker[-1]["y"] < tracker[-2]["y"]-50:
+                            print("up")
+                            keyboard.press(Key.up)
+                        elif tracker[-1]["x"] > tracker[-2]["x"] + 50:
+                            print("left")
+                            keyboard.press(Key.left)
+                        elif tracker[-1]["x"] < tracker[-2]["x"]-50:
+                            print("right")
+                            keyboard.press(Key.right)
+
             
     def shouldMove(max = 2):
         moveOrNot = True
